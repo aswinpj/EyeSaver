@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -28,14 +29,13 @@ public class DetectScreenUnlockService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+            Timer executor = new Timer();
             if(intent.getAction().equals("android.intent.action.USER_PRESENT"))
             {
                 Log.d("SERVICE","SCHEDULING STUFF..."+timeDelay);
-                executor.scheduleAtFixedRate(new Runnable() {
+                executor.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
-
                         Log.d("SERVICE", "Showing Notification");
                         Notification notification = new NotificationCompat.Builder(getApplicationContext())
                                 .setContentTitle("Time to Look Away!")
@@ -46,29 +46,23 @@ public class DetectScreenUnlockService extends Service {
 
                         final NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                         manager.notify(0,notification);
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                Log.d("SERVICE","CANCELLING THE NOTIFICATION");
-                                manager.cancelAll();
-
-                            }
-                        },5000);
+                        SystemClock.sleep(15000);
+                        manager.cancelAll();
 
 
 
 
 
                 }
-                },timeDelay,timeDelay, TimeUnit.MINUTES);
+                },timeDelay*60*1000,timeDelay*60*1000);
 
             }
             else
             {
                 Log.d("SERVICE","SHUTTING DOWN THE EXECUTOR POOL");
-                executor.shutdownNow();
+                executor.cancel();
+                executor.purge();
+
             }
 
         }
