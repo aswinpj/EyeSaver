@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.opengl.Visibility;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -39,9 +40,13 @@ public class DetectScreenUnlockService extends Service {
                         Log.d("SERVICE", "Showing Notification");
                         Notification notification = new NotificationCompat.Builder(getApplicationContext())
                                 .setContentTitle("Time to Look Away!")
+                                .setContentText("Look at a distant object.")
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.eye)
                                 .setStyle(new NotificationCompat.BigTextStyle().bigText("You have been using your phone continuously for quite some time.Please look at a distant object and then resume using the phone."))
+                                .setVisibility(Notification.VISIBILITY_SECRET)
+                                .setPriority(Notification.PRIORITY_MAX)
+                                .setVibrate(new long[0])
                                 .build();
 
                         final NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
